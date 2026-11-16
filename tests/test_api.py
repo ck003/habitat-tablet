@@ -3,8 +3,18 @@
 import aiohttp
 from aiohttp import web
 import pytest
+import pytest_socket
 
 from custom_components.habitat_tablet.api import CannotConnect, CommandFailed, InvalidAuth, TabletApi, normalize_url
+
+
+@pytest.fixture(autouse=True)
+def loopback_only():
+    """These wire tests intentionally run a server, limited to loopback."""
+    pytest_socket.enable_socket()
+    pytest_socket.socket_allow_hosts(["127.0.0.1"])
+    yield
+    pytest_socket.disable_socket(allow_unix_socket=True)
 
 
 async def test_authenticated_commands(aiohttp_server, snapshot):
@@ -42,15 +52,21 @@ async def test_rejected_responses(aiohttp_server, status, body, error):
             await TabletApi(session, str(server.make_url("/")), "key").get_screen()
 
 
-async def test_does_not_follow_redirect_with_secret(aiohttp_server):
+async def test_does_not_follow_redirect_with_secret(aiohttp_server, snapshot):
     app = web.Application()
+    reached = []
     async def redirect(_):
-        raise web.HTTPFound("http://127.0.0.1:1/steal")
+        raise web.HTTPFound("/steal")
+    async def destination(request):
+        reached.append(request.headers.get("Authorization"))
+        return web.json_response(snapshot)
     app.router.add_get("/api/screen", redirect)
+    app.router.add_get("/steal", destination)
     server = await aiohttp_server(app)
     async with aiohttp.ClientSession() as session:
         with pytest.raises(CannotConnect):
             await TabletApi(session, str(server.make_url("/")), "key").get_screen()
+    assert not reached
 
 
 async def test_command_must_confirm_actual_state(aiohttp_server, snapshot):
