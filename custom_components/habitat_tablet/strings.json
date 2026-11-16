@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect tablet",
+        "description": "Enable HA screen control in the Habitat app and copy its address and pairing key.",
+        "data": {
+          "url": "Tablet address",
+          "token": "Pairing key"
+        }
+      },
+      "reconfigure": {
+        "title": "Connect tablet",
+        "description": "Enable HA screen control in the Habitat app and copy its address and pairing key.",
+        "data": {
+          "url": "Tablet address",
+          "token": "Pairing key"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Connect tablet",
+        "description": "Enable HA screen control in the Habitat app and copy its address and pairing key.",
+        "data": {
+          "url": "Tablet address",
+          "token": "Pairing key"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Pairing key rejected. Copy it again from the tablet.",
+      "cannot_connect": "Cannot connect. Check the address, Wi-Fi and screen control service.",
+      "invalid_address": "Enter the tablet address, for example http://192.168.1.50:8765."
+    },
+    "abort": {
+      "already_configured": "This tablet is already configured.",
+      "wrong_device": "This address belongs to a different tablet. Add it separately.",
+      "reconfigure_successful": "Tablet connection updated.",
+      "reauth_successful": "Pairing key updated."
+    }
+  },
+  "entity": {
+    "switch": {
+      "screen": {
+        "name": "Screen"
+      }
+    }
+  }
+}

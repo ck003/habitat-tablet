@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接平板",
+        "description": "在平板 App 设置中开启「HA 屏幕控制」，复制地址和配对密钥。",
+        "data": {
+          "url": "平板地址",
+          "token": "配对密钥"
+        }
+      },
+      "reconfigure": {
+        "title": "连接平板",
+        "description": "在平板 App 设置中开启「HA 屏幕控制」，复制地址和配对密钥。",
+        "data": {
+          "url": "平板地址",
+          "token": "配对密钥"
+        }
+      },
+      "reauth_confirm": {
+        "title": "连接平板",
+        "description": "在平板 App 设置中开启「HA 屏幕控制」，复制地址和配对密钥。",
+        "data": {
+          "url": "平板地址",
+          "token": "配对密钥"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "配对密钥不正确，请从平板重新复制。",
+      "cannot_connect": "无法连接平板，请检查地址、Wi-Fi 和屏幕控制服务。",
+      "invalid_address": "请输入平板显示的地址，例如 http://192.168.1.50:8765。"
+    },
+    "abort": {
+      "already_configured": "该平板已经添加。",
+      "wrong_device": "该地址属于另一台平板，请单独添加。",
+      "reconfigure_successful": "平板连接已更新。",
+      "reauth_successful": "配对密钥已更新。"
+    }
+  },
+  "entity": {
+    "switch": {
+      "screen": {
+        "name": "屏幕"
+      }
+    }
+  }
+}

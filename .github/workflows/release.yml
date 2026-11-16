@@ -1,0 +1,39 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version matching manifest.json, e.g. 1.0.0'
+        required: true
+permissions:
+  contents: write
+jobs:
+  validate:
+    uses: ./.github/workflows/validate.yml
+  release:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate and package
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          python - <<'PY'
+          import json, os, re, zipfile
+          from pathlib import Path
+          version = os.environ['RELEASE_VERSION']
+          root = Path('custom_components/habitat_tablet')
+          assert re.fullmatch(r'\d+\.\d+\.\d+', version), 'Use a stable semantic version'
+          assert json.loads((root / 'manifest.json').read_text())['version'] == version
+          with zipfile.ZipFile('habitat_tablet.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for path in sorted(root.rglob('*')):
+                  if path.is_file() and '__pycache__' not in path.parts:
+                      archive.write(path, path.relative_to(root))
+          PY
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          gh release create "$RELEASE_VERSION" habitat_tablet.zip --target "$GITHUB_SHA" --title "Habitat Tablet $RELEASE_VERSION" --generate-notes
