@@ -1,5 +1,6 @@
 """Low-frequency screen state polling."""
 
+import asyncio
 import logging
 from datetime import timedelta
 from typing import Any
@@ -22,6 +23,7 @@ class ScreenCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.api = TabletApi(async_get_clientsession(hass), entry.data[CONF_URL], entry.data[CONF_TOKEN])
         self.device_id = entry.unique_id
+        self._request_lock = asyncio.Lock()
         super().__init__(
             hass, LOGGER, config_entry=entry, name=DOMAIN,
             update_interval=timedelta(seconds=30), always_update=False,
@@ -33,7 +35,8 @@ class ScreenCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
-            data = await self.api.get_screen()
+            async with self._request_lock:
+                data = await self.api.get_screen()
             self._check_identity(data)
             return data
         except InvalidAuth as err:
@@ -43,7 +46,8 @@ class ScreenCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def async_set_screen(self, on: bool) -> None:
         try:
-            data = await self.api.set_screen(on)
+            async with self._request_lock:
+                data = await self.api.set_screen(on)
             self._check_identity(data)
         except InvalidAuth as err:
             self.async_set_update_error(ConfigEntryAuthFailed("Pairing key rejected"))

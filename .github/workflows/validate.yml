@@ -16,7 +16,9 @@ jobs:
           python-version: '3.14'
       - uses: astral-sh/setup-uv@v6
       - run: uv pip install --system --override requirements_ha.txt -r requirements_test.txt
-      - run: python -m pytest -q
+      # HA 2026.11 aliases httpx2 to httpx. Install that alias before pytest's
+      # auto-loaded respx/test-harness plugins import httpx themselves.
+      - run: python -c "import homeassistant; import pytest; raise SystemExit(pytest.main(['-q']))"
   hassfest:
     runs-on: ubuntu-latest
     steps:
