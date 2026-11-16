@@ -1,3 +1,2 @@
-homeassistant==2026.11.1
-pytest-homeassistant-custom-component
-pytest-aiohttp
+pytest-homeassistant-custom-component==0.13.375
+pytest-aiohttp==1.1.1

@@ -33,7 +33,9 @@ async def test_authenticated_commands(aiohttp_server, snapshot):
 ])
 async def test_rejected_responses(aiohttp_server, status, body, error):
     app = web.Application()
-    app.router.add_get("/api/screen", lambda _: web.json_response(body, status=status))
+    async def screen(_):
+        return web.json_response(body, status=status)
+    app.router.add_get("/api/screen", screen)
     server = await aiohttp_server(app)
     async with aiohttp.ClientSession() as session:
         with pytest.raises(error):
@@ -53,7 +55,9 @@ async def test_does_not_follow_redirect_with_secret(aiohttp_server):
 
 async def test_command_must_confirm_actual_state(aiohttp_server, snapshot):
     app = web.Application()
-    app.router.add_post("/api/screen", lambda _: web.json_response(snapshot))
+    async def screen(_):
+        return web.json_response(snapshot)
+    app.router.add_post("/api/screen", screen)
     server = await aiohttp_server(app)
     async with aiohttp.ClientSession() as session:
         with pytest.raises(CommandFailed):

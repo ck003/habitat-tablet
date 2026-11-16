@@ -1,0 +1,3 @@
+# The newest published test harness still pins HA 2026.10.4. Test the actual
+# supported runtime, rather than letting the resolver choose an ancient harness.
+homeassistant==2026.11.1
